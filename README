@@ -1,0 +1,15 @@
+# Ansible Borg Backup Setup
+
+This playbook setup borg via the following steps
+
+## Create Python Virtualenv
+
+Install some mandatory python packages and creating a virtualenv named `borg`.
+
+## Setup Build Dependencies for Borg
+
+Setup the build dependencies to setup borg
+
+## Install borgbackup via pip
+
+Install `borgbackup` via `pip` within the virtual envonrment named `borg`.
