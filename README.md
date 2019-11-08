@@ -35,7 +35,6 @@ Setup borg and the backup jobs:
 ansible-playbook -i ~/borg-inventory site.yml \
  --ask-vault-pass \
  -e@~/borgpassphrase.vault \
- -e@~/borgjobs.yml \
  -e@~/borgjobs.yml
 ```
 
