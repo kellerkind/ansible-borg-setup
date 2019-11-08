@@ -1,15 +1,25 @@
 # Ansible Borg Backup Setup
 
-This playbook setup borg via the following steps
+## Setup
 
-## Create Python Virtualenv
+Create an inventory file containing your borg hosts
 
-Install some mandatory python packages and creating a virtualenv named `borg`.
+inventory:
+```
+[borg]
+...
+```
 
-## Setup Build Dependencies for Borg
+Create a vault file containing your `borg_passphrase`
 
-Setup the build dependencies to setup borg
+ansible-vault edit ~/borgpassphrase.vault
 
-## Install borgbackup via pip
+Setup borg and the backup jobs:
 
-Install `borgbackup` via `pip` within the virtual envonrment named `borg`.
+```
+ansible-playbook -i inventory site.yml --ask-vault-pass -e@~/borgpassphrase.vault
+```
+
+Borgbackup is installed by default, using  its own in an virtualenv using the python package from pip.
+
+DISCLAIMER: The passphrase is currently part of the crontab entry.

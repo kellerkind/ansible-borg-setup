@@ -1,6 +1,14 @@
 ---
 - hosts: borg
+  gather_facts: true
   vars:
+    backup_jobs:
+            - source: /media/data1/Gunnar/Documents
+              archive: /media/data1/borgbackup
+    # virtualenv_path may contain tilde in path (~/...) but this is used from the current user
+    # on the ansible controller
+    virtualenv_path: "{{ '/home/pi/.virtualenvs/borg' | expanduser }}"
+    borg_path: "{{ '/'.join([virtualenv_path, 'bin/borg'])}}"
     packages:
       - python3 
       - python3-dev 
@@ -15,11 +23,36 @@
       - fuse 
       - pkg-config
   tasks:
-    - package:
+    - name: Install debian specific package dependencies ...
+      package:
         name: "{{ packages }}"
       become: true
     - pip:
-        virtualenv: ~/.virtualenvs/borg 
+        virtualenv: "{{ virtualenv_path | dirname }}"
         virtualenv_python: python3
         name: borgbackup
-
+    - name: Deploy borgbackup wrapper script
+      copy: 
+        src: files/borgwrapper.sh
+        dest: "{{ borg_path | dirname }}"
+        mode: "u=rx"
+    - name: Cronjob prepare environment
+      cron:
+        name: "{{ item.name }}"
+        job: "{{ item.job }}"
+        env: yes
+      loop:
+        - name: PATH
+          job: "{{ '/'.join([virtualenv_path, 'bin']) }}:{{ ansible_env.PATH }}"
+        - name: BORG_PASSPHRASE
+          job: "{{ borg_passphrase }}"
+    - name: Cronjob create job
+      cron:
+        name: Backup "{{ item.source }}"
+        env: no
+        job: "borgwrapper.sh {{ item.archive }} {{ inventory_hostname }}{{ item.source.replace('/', '-') }} {{ item.source }}"
+        weekday: "*"
+        minute: "29"
+        hour: "11"
+      loop:
+        "{{backup_jobs }}"
