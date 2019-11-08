@@ -1,0 +1,20 @@
+- name: Cronjob prepare environment
+  cron:
+    name: "{{ item.name }}"
+    job: "{{ item.job }}"
+    env: yes
+  loop:
+    - name: PATH
+      job: "{{ '/'.join([virtualenv_path, 'bin']) }}:{{ ansible_env.PATH }}"
+    - name: BORG_PASSPHRASE
+      job: "{{ borg_passphrase }}"
+- name: Cronjob create job
+  cron:
+    name: Backup "{{ item.source }}"
+    env: no
+    job: "borgwrapper.sh {{ item.archive }} {{ inventory_hostname }}{{ item.source.replace('/', '-') }} {{ item.source }}"
+    weekday: "*"
+    minute: "29"
+    hour: "11"
+  loop:
+    "{{backup_jobs }}"

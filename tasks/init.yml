@@ -1,0 +1,12 @@
+- name: init archive
+  shell: borg init -e keyfile "{{ item.archive }}"
+  args:
+    creates: "{{ item.archive }}"
+  environment: 
+    PATH: "{{ borg_parent_path }}:{{ ansible_env.PATH }}"
+    BORG_PASSPHRASE: "{{ borg_passphrase }}"
+  loop:
+    "{{ backup_jobs }}"
+  tags:
+    - borg_init
+

@@ -1,0 +1,13 @@
+- name: Install debian specific package dependencies ...
+  package:
+    name: "{{ packages }}"
+  become: true
+- pip:
+    virtualenv: "{{ virtualenv_path | dirname }}"
+    virtualenv_python: python3
+    name: borgbackup
+- name: Deploy borgbackup wrapper script
+  copy: 
+    src: files/borgwrapper.sh
+    dest: "{{ borg_parent_path }}"
+    mode: "u=rx"
