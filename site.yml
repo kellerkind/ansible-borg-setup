@@ -2,9 +2,6 @@
 - hosts: borg
   gather_facts: true
   vars:
-    backup_jobs:
-            - source: /media/data1/Gunnar/Documents
-              archive: /media/data1/borgbackup
     # virtualenv_path may contain tilde in path (~/...) but this is used from the current user
     # on the ansible controller
     virtualenv_path: "{{ '/home/pi/.virtualenvs/borg' | expanduser }}"
